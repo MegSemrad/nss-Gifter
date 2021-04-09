@@ -76,6 +76,17 @@ namespace Gifter.Controllers
 
 
 
+        [HttpGet("GetWithComments")]
+        public IActionResult GetWithComments()
+        {
+            var posts = _postRepository.GetAllWithComments();
+            return Ok(posts);
+        }
+
+
+
+
+
         // https://localhost:5001/api/post/5
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
