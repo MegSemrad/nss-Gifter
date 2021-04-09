@@ -11,6 +11,10 @@ namespace Gifter.Repositories
     {
         public PostRepository(IConfiguration configuration) : base(configuration) { }
 
+
+
+
+
         public List<Post> GetAll()
         {
             using (var conn = Connection)
@@ -45,6 +49,10 @@ namespace Gifter.Repositories
                 }
             }
         }
+
+
+
+
 
         public Post GetById(int id)
         {
@@ -83,6 +91,9 @@ namespace Gifter.Repositories
             }
         }
 
+
+
+
         public void Add(Post post)
         {
             using (var conn = Connection)
@@ -105,6 +116,10 @@ namespace Gifter.Repositories
                 }
             }
         }
+
+
+
+
 
         public void Update(Post post)
         {
@@ -133,6 +148,10 @@ namespace Gifter.Repositories
                 }
             }
         }
+
+
+
+
 
         public void Delete(int id)
         {
