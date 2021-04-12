@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Gifter.Models;
@@ -89,7 +88,7 @@ namespace Gifter.Repositories
                     var reader = cmd.ExecuteReader();
 
                     Post post = null;
-                    if (reader.Read())
+                    if (reader.Read()) //Read() = method in ADO.NET
                     {
                         post = new Post()
                         {
@@ -108,6 +107,68 @@ namespace Gifter.Repositories
                                 ImageUrl = DbUtils.GetString(reader, "UserProfileImageUrl"),
                             },
                         };
+                    }
+
+                    reader.Close();
+
+                    return post;
+                }
+            }
+        }
+
+
+
+
+
+        public Post GetPostByIdWithComments(int id)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                    SELECT p.Id AS PostId, p.Title, p.Caption, p.DateCreated AS PostDateCreated,
+                            p.ImageUrl AS PostImageUrl, p.UserProfileId AS PostUserProfileId,
+
+                            c.Id AS CommentId, c.Message, c.UserProfileId AS CommentUserProfileId
+                    FROM Post p
+                    LEFT JOIN Comment c on c.PostId = p.id
+                    WHERE p.Id = @Id";
+
+                    DbUtils.AddParameter(cmd, "@Id", id);
+
+                    var reader = cmd.ExecuteReader();
+
+                    Post post = null;
+                    while (reader.Read()) // used a 'while' here because returning potentially multiple comments
+                    {
+                        if (post == null) 
+                        // this 'if' is necessary b/c the 'while' loop would otherwise continue to run even though 
+                        // only want single comment returned. So need to check that variable post is null and if is 
+                        // then create a new post. If post is created then it will skip down to line with next 'if' 
+                        {
+                            post = new Post()
+                            {
+                                Id = id,
+                                Title = DbUtils.GetString(reader, "Title"),
+                                Caption = DbUtils.GetString(reader, "Caption"),
+                                DateCreated = DbUtils.GetDateTime(reader, "PostDateCreated"),
+                                ImageUrl = DbUtils.GetString(reader, "PostImageUrl"),
+                                UserProfileId = DbUtils.GetInt(reader, "PostUserProfileId"),
+                                Comments = new List<Comment>()
+                            };
+                        }
+                        if (DbUtils.IsNotDbNull(reader, "CommentId"))
+                        {
+                            post.Comments.Add(new Comment()
+                            {
+                                Id = DbUtils.GetInt(reader, "CommentId"),
+                                Message = DbUtils.GetString(reader, "Message"),
+                                PostId = id,
+                                UserProfileId = DbUtils.GetInt(reader, "CommentUserProfileId")
+                            });
+                        }
                     }
 
                     reader.Close();
@@ -148,6 +209,9 @@ namespace Gifter.Repositories
                     {
                         var postId = DbUtils.GetInt(reader, "PostId");
 
+                        // the below "existingPost" is to check there are not duplicate lines. A single post can be duplicated multiple times 
+                        // in a query if that post had multipe comments. So if adding comments or anything else meant potentially having duplicate 
+                        // lines then add the below code - really if only making a <List>
                         var existingPost = posts.FirstOrDefault(p => p.Id == postId);
                         if (existingPost == null)
                         {
