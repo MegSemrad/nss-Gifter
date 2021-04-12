@@ -14,11 +14,19 @@ namespace Gifter.Controllers
             _userProfileRepository = userProfileRepository;
         }
 
+
+
+
+
         [HttpGet]
         public IActionResult Get()
         {
             return Ok(_userProfileRepository.GetAll());
         }
+
+
+
+
 
         [HttpGet("{id}")]
         public IActionResult Get(int id)
@@ -31,12 +39,20 @@ namespace Gifter.Controllers
             return Ok(userProfile);
         }
 
+
+
+
+
         [HttpPost]
         public IActionResult Post(UserProfile userProfile)
         {
             _userProfileRepository.Add(userProfile);
             return CreatedAtAction("Get", new { id = userProfile.Id }, userProfile);
         }
+
+
+
+
 
         [HttpPut("{id}")]
         public IActionResult Put(int id, UserProfile userProfile)
@@ -49,6 +65,25 @@ namespace Gifter.Controllers
             _userProfileRepository.Update(userProfile);
             return NoContent();
         }
+
+
+
+
+
+        [HttpGet("GetUserProfileByIdWithPosts")]
+        public IActionResult GetUserProfileByIdWithPosts(int id)
+        {
+            var userProfile = _userProfileRepository.GetUserProfileByIdWithPosts(id);
+            if (userProfile == null)
+            {
+                return NotFound();
+            }
+            return Ok(userProfile);
+        }
+
+
+
+
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
