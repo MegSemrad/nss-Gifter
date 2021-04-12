@@ -7,7 +7,7 @@ using Gifter.Utils;
 
 namespace Gifter.Repositories
 {
-    public class UserProfileRepository : BaseRepository
+    public class UserProfileRepository : BaseRepository, IUserProfileRepository
     {
         public UserProfileRepository(IConfiguration configuration) : base(configuration) { }
 
