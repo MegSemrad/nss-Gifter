@@ -54,42 +54,41 @@ namespace Gifter.Repositories
 
 
 
-        //public Post GetById(int id)
-        //{
-        //    using (var conn = Connection)
-        //    {
-        //        conn.Open();
-        //        using (var cmd = conn.CreateCommand())
-        //        {
-        //            cmd.CommandText = @"
-        //                  SELECT Title, Caption, DateCreated, ImageUrl, UserProfileId
-        //                    FROM Post
-        //                   WHERE Id = @Id";
+        public UserProfile GetById(int id)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                          SELECT Name, Email, DateCreated, ImageUrl
+                            FROM UserProfile
+                           WHERE Id = @Id";
 
-        //            DbUtils.AddParameter(cmd, "@Id", id);
+                    DbUtils.AddParameter(cmd, "@Id", id);
 
-        //            var reader = cmd.ExecuteReader();
+                    var reader = cmd.ExecuteReader();
 
-        //            Post post = null;
-        //            if (reader.Read())
-        //            {
-        //                post = new Post()
-        //                {
-        //                    Id = id,
-        //                    Title = DbUtils.GetString(reader, "Title"),
-        //                    Caption = DbUtils.GetString(reader, "Caption"),
-        //                    DateCreated = DbUtils.GetDateTime(reader, "DateCreated"),
-        //                    ImageUrl = DbUtils.GetString(reader, "ImageUrl"),
-        //                    UserProfileId = DbUtils.GetInt(reader, "UserProfileId"),
-        //                };
-        //            }
+                    UserProfile userProfile = null;
+                    if (reader.Read())
+                    {
+                        userProfile = new UserProfile()
+                        {
+                            Id = id,
+                            Name = DbUtils.GetString(reader, "Name"),
+                            Email = DbUtils.GetString(reader, "Email"),
+                            DateCreated = DbUtils.GetDateTime(reader, "DateCreated"),
+                            ImageUrl = DbUtils.GetString(reader, "ImageUrl"),
+                        };
+                    }
 
-        //            reader.Close();
+                    reader.Close();
 
-        //            return post;
-        //        }
-        //    }
-        //}
+                    return userProfile;
+                }
+            }
+        }
 
 
 
