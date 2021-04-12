@@ -103,7 +103,7 @@ namespace Gifter.Repositories
                     cmd.CommandText = @"
                         INSERT INTO UserProfile (Name, Email, ImageUrl, DateCreated)
                         OUTPUT INSERTED.ID
-                        VALUES (@Title, @Caption, @DateCreated, @ImageUrl, @UserProfileId)";
+                        VALUES (@Name, @Email, @DateCreated, @ImageUrl)";
 
                     DbUtils.AddParameter(cmd, "@Name", userProfile.Name);
                     DbUtils.AddParameter(cmd, "@Email", userProfile.Email);
