@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Gifter.Models;
 using Gifter.Utils;
+using System;
 
 namespace Gifter.Repositories
 {
@@ -364,6 +365,10 @@ namespace Gifter.Repositories
                     }
 
                     cmd.CommandText = sql;
+                    //LIKE operateor used above rules as also seen in below line of code 
+                    // {criterion} means find value exactly the same
+                    // %{criterion}% means find value that have 'criterion' in any position
+                    // there are other combinations on w3schools
                     DbUtils.AddParameter(cmd, "@Criterion", $"%{criterion}%");
                     var reader = cmd.ExecuteReader();
 
@@ -386,6 +391,57 @@ namespace Gifter.Repositories
                                 DateCreated = DbUtils.GetDateTime(reader, "UserProfileDateCreated"),
                                 ImageUrl = DbUtils.GetString(reader, "UserProfileImageUrl"),
                             },
+                        });
+                    }
+
+                    reader.Close();
+
+                    return posts;
+                }
+            }
+        }
+
+
+
+
+
+        public List<Post> Search(DateTime criterion, bool sortDescending)
+        {
+            using (var conn = Connection)
+            {
+                conn.Open();
+                using (var cmd = conn.CreateCommand())
+                {
+                    var sql =
+                        @"SELECT p.Id AS PostId, p.Title, p.Caption, p.DateCreated, 
+                        p.ImageUrl AS PostImageUrl, p.UserProfileId
+                    FROM Post p 
+                    WHERE p.DateCreated >= @Criterion";
+
+                    if (sortDescending)
+                    {
+                        sql += " ORDER BY p.DateCreated DESC";
+                    }
+                    else
+                    {
+                        sql += " ORDER BY p.DateCreated";
+                    }
+
+                    cmd.CommandText = sql;
+                    DbUtils.AddParameter(cmd, "@Criterion", $"{criterion}");
+                    var reader = cmd.ExecuteReader();
+
+                    var posts = new List<Post>();
+                    while (reader.Read())
+                    {
+                        posts.Add(new Post()
+                        {
+                            Id = DbUtils.GetInt(reader, "PostId"),
+                            Title = DbUtils.GetString(reader, "Title"),
+                            Caption = DbUtils.GetString(reader, "Caption"),
+                            DateCreated = DbUtils.GetDateTime(reader, "DateCreated"),
+                            ImageUrl = DbUtils.GetString(reader, "PostImageUrl"),
+                            UserProfileId = DbUtils.GetInt(reader, "UserProfileId")
                         });
                     }
 
