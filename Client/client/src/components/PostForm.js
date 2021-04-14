@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { PostContext } from "../providers/PostProvider";
 import { useHistory } from 'react-router-dom';
 
@@ -27,7 +27,7 @@ const PostForm = () => {
     const handleClickSavePost = (event) => {
         event.preventDefault()
         addPost(post)
-            .then(() => history.push("/posts"))
+            .then(() => history.push("/"))
     }
 
     return (
